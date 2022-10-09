@@ -16,4 +16,4 @@ storyroute.get("/getcurrentstory",verifyJwt,getCurrentuserStories);
 
 storyroute.post("/getotherstory",verifyJwt,getOthersStory);
 
-module.exports=storyroute;
+module.exports=storyroute;  
