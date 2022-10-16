@@ -24,6 +24,7 @@ const usermodel = require("../models/usermodel");
 
     
     if (isChat.length > 0) {
+
         return res.status(200).json({"chatId":isChat[0]._id});
     } else {
         try {
@@ -35,7 +36,8 @@ const usermodel = require("../models/usermodel");
             };
 
             const createChatroom = await chatmodel.create(chatData);
-            const chat = await chatmodel.find({ _id: createChatroom._id }).populate("users", "-password");
+            const chat = await chatmodel.findById(createChatroom._id );
+            
             return res.status(200).json({"chatId":chat._id});
 
 
