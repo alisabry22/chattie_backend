@@ -52,11 +52,12 @@ io.on("connection", (client) => {
   })
 
 
-});
+}); 
 changeStream = chatmodel.watch();
 
 changeStream.on("change", async data => {
-  const message = await messagemodel.findById(data.updateDescription.updatedFields.latestMessage).populate("sender","username email phone countrycode");
+  
+  var message = await messagemodel.findById(data.updateDescription.updatedFields.latestMessage).populate("sender","username email phone countrycode");
   
 
 io.to(message.chat.toString()).emit("latestmessage",message);
