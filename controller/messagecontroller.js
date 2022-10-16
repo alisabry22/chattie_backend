@@ -20,7 +20,7 @@ return uploadmessage;
 const allMessages=async(req,res)=>{
 
     const chatId=req.params.chatId;
-
+	console.log("chat id ", charId);
 
    try {
 	 const messages=await messagemodel.find({chat:chatId}).populate("sender","username phone email countrycode ");
