@@ -1,5 +1,3 @@
-const { json } = require("express");
-const ObjectId = require("mongoose/lib/types/objectid");
 const chatmodel = require("../models/chatmodel");
 const messagemodel=require("../models/messagemodel");
 
@@ -20,7 +18,7 @@ return uploadmessage;
 const allMessages=async(req,res)=>{
 
     const chatId=req.params.chatId;
-	console.log("chat id ", charId);
+	console.log("chat id ", chatId);
 
    try {
 	 const messages=await messagemodel.find({chat:chatId}).populate("sender","username phone email countrycode ");

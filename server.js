@@ -12,8 +12,8 @@ const { sendMessage } = require("./controller/messagecontroller")
 const storyroute = require("./routes/storyroutes")
 const chatmodel = require("./models/chatmodel")
 const messagemodel = require("./models/messagemodel")
-const { populate } = require("./models/chatmodel")
 const usermodel = require("./models/usermodel")
+const storyModel = require("./models/storyModel")
 
 
 app.use(express.urlencoded({ extended: false }));
@@ -47,25 +47,57 @@ io.on("connection", (client) => {
   client.on("sendMessage", async (data) => {
 
     message = await sendMessage(data.content, data.sender, data.chatId);
-
     io.to(data.chatId).emit("message", message);
   })
 
 
 }); 
-changeStream = chatmodel.watch();
+chatChangeStream = chatmodel.watch();
 
-changeStream.on("change", async data => {
-  console.log(data.operationType);
-  if(data.operationType==="update"){
+chatChangeStream.on("change", async data => {
+console.log(data);
+
+switch(data.operationType){
+  case 'update':
     var message = await messagemodel.findById(data.updateDescription.updatedFields.latestMessage).populate("sender","username email phone countrycode");
-    io.to(message.chat.toString()).emit("latestmessage",message);
-  }
+    io.emit("latestmessage",message);
+    break;
+    case 'delete':
+     io.emit("deletedchat",data.documentKey._id);
+     break;
+     case 'insert':
+      var chat=await chatmodel.findById(data.fullDocument._id).populate("users","username email phone countrycode");
+      console.log(chat);
+      io.emit("createdchat",chat);
+      break;
+
+}
+   
+  
 
   
 
 
 });
+
+storyChangeStream=storyModel.watch();
+
+storyChangeStream.on("change",async data=>{
+
+  switch(data.operationType){
+    case 'insert':
+      var story=await storyModel.findById(data.fullDocument._id).populate("userId","username email phone countrycode");
+      console.log(story);
+      io.emit("insertedStory",story);
+      break;
+      case 'delete':
+        io.emit("deletedStory",data.documentKey._id);
+        break;
+  }
+
+});
+
+
 
 
 
