@@ -1,5 +1,5 @@
 const express=require("express");
-const { uploadStory, getCurrentuserStories, getOthersStory } = require("../controller/storyController");
+const { uploadStory, getCurrentuserStories, getOthersStory, deleteStory } = require("../controller/storyController");
 const storyroute=express.Router();
 const verifyJwt=require("../middlewares/jwtverify")
 
@@ -15,5 +15,9 @@ storyroute.get("/getcurrentstory",verifyJwt,getCurrentuserStories);
 //get others story 
 
 storyroute.post("/getotherstory",verifyJwt,getOthersStory);
+
+//delete story 
+
+storyroute.post("/deletestory",verifyJwt,deleteStory);
 
 module.exports=storyroute;  

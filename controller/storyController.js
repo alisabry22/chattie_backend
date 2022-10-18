@@ -40,19 +40,34 @@ const getOthersStory = async (req, res) => {
         return res.status(400).json({ msg: "please provide others phones" });
     }
 
-    var stories = await usermodel.find({ $and:[
-       { phone:{$in:phones}},
-       {phone:{$ne:req.user.phone}}
-    ] })
-    .select("stories username phone email countrycode").populate("stories");
+    var stories = await usermodel.find({
+        $and: [
+            { phone: { $in: phones } },
+            { phone: { $ne: req.user.phone } }
+        ]
+    })
+        .select("stories username phone email countrycode").populate("stories");
 
 
     if (!stories) {
-        return res.status(400).json({ msg: "please add some people" });
+        return res.status(400).json({ msg: "please add some people" });;
     }
     return res.status(200).json({ stories });
 
 
 }
 
-module.exports = { uploadStory, getCurrentuserStories, getOthersStory };
+const deleteStory = async (req, res) => {
+
+    const storyId = req.body.storyId;
+
+    await storyModel.findByIdAndRemove(storyId);
+    var deletedstory=await usermodel.updateOne({_id:req.user._id}, {$pull:{stories:{storyId}}});
+    if(!deletedstory){
+        return res.status(400).json({msg:"their is no story "});
+    }
+    return res.status(200).json({msg:"Deleted Successfullu"});
+
+}
+
+module.exports = { uploadStory, getCurrentuserStories, getOthersStory, deleteStory };
