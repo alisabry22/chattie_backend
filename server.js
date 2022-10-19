@@ -80,6 +80,7 @@ switch(data.operationType){
 
 });
 
+//on adding story send event 
 storyChangeStream=storyModel.watch();
 
 storyChangeStream.on("change",async data=>{
@@ -91,6 +92,7 @@ storyChangeStream.on("change",async data=>{
       io.emit("insertedStory",story);
       break;
       case 'delete':
+        console.log("deleted story",data.documentKey._id);
         io.emit("deletedStory",data.documentKey._id);
         break;
   }
