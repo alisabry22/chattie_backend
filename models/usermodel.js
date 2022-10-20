@@ -8,6 +8,7 @@ const user= mongoose.Schema({
     email:{type:String},
     phone:{type:String},
     countrycode:{type:String},
+    profilephoto:{type:String},
     stories:[
         {
             type:mongoose.Schema.Types.ObjectId,
