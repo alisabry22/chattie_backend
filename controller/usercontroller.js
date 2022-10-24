@@ -5,10 +5,11 @@ require("dotenv").config();
 
 create_user = async (req, res) => {
 
+    console.log(req.body);
     try {
-        const { username, password, email, phone,countrycode } = req.body;
+        const { username, password, email, phone,countrycode,profilephoto } = req.body;
      
-        if (!username || !password || !email || !phone) {
+        if (!username || !password || !email || !phone || !profilephoto) {
 
             return res.status(400).json({ msg: "please fill in all parts" })
 
@@ -26,7 +27,7 @@ create_user = async (req, res) => {
         }
         const hashedpassword = await bcrypt.hash(password, 10);
 
-        user = new usermodel({ username: username, password: hashedpassword, email: email, phone: phone ,countrycode:countrycode})
+        user = new usermodel({ username: username, password: hashedpassword, email: email, phone: phone ,countrycode:countrycode,profilephoto:profilephoto})
         await user.save();
 
         const token = jwt.sign({ uid: user.id }, process.env.JWT_KEY, {
@@ -111,4 +112,29 @@ const getUserInfo=async(req,res)=>{
     }
   
 }
-module.exports = { create_user, validate_user, renewtoken,getUserInfo };
+
+const editInfo=async(req,res)=>{
+
+    const {profilephoto,quote}=req.body;
+   try {
+	 if(!profilephoto || !quote ){
+	        return res.status(400).json({msg:"please fill all parts"});
+	
+	
+	
+	    }
+	
+	    var user=await usermodel.findByIdAndUpdate(req.user._id,{
+	        profilephoto:profilephoto,
+	        quote:quote,
+	    });
+	
+	    if(user){
+	        return res.json(200).json(user);
+	    }
+} catch (error) {
+	return res.status(500).json({msg:error.toString()});
+}
+
+}
+module.exports = { create_user, validate_user, renewtoken,getUserInfo,editInfo };

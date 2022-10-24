@@ -9,6 +9,7 @@ const user= mongoose.Schema({
     phone:{type:String},
     countrycode:{type:String},
     profilephoto:{type:String},
+    quote:{type:String,default:"Hello There Iam Using chattie"},
     stories:[
         {
             type:mongoose.Schema.Types.ObjectId,
