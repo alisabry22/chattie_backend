@@ -8,7 +8,6 @@ verifyjwt=async(req,res,next)=>{
     return res.status(403).json({msg:" A token is required for authentication"})
    }
     const token = authheader.toString().split(" ")[1];
-
    
     if(!token)return res.status(403).json({msg:" A token is required for authentication"});
     try{

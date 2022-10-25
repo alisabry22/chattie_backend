@@ -113,11 +113,11 @@ const getUserInfo=async(req,res)=>{
   
 }
 
-const editInfo=async(req,res)=>{
-
-    const {profilephoto,quote}=req.body;
+const editProfileImage=async(req,res)=>{
+    console.log(req.body);
+    const {profilephoto}=req.body;
    try {
-	 if(!profilephoto || !quote ){
+	 if(!profilephoto){
 	        return res.status(400).json({msg:"please fill all parts"});
 	
 	
@@ -126,8 +126,8 @@ const editInfo=async(req,res)=>{
 	
 	    var user=await usermodel.findByIdAndUpdate(req.user._id,{
 	        profilephoto:profilephoto,
-	        quote:quote,
 	    });
+        console.log(user);
 	
 	    if(user){
 	        return res.json(200).json(user);
@@ -137,4 +137,24 @@ const editInfo=async(req,res)=>{
 }
 
 }
-module.exports = { create_user, validate_user, renewtoken,getUserInfo,editInfo };
+const editProfileQuote=async(req,res)=>{
+    const quote=req.body;
+
+ try {
+	   if(!quote){
+	        return res.status(400).json({"msg":"please provide quote to change"});
+	    }
+	
+	    var user=await usermodel.findByIdAndUpdate(req.user._id,{
+	        quote:quote
+	    });
+	
+	    if(user){
+	        return res.status(200).json(user);
+	    }
+	
+} catch (error) {
+	return res.status(500).json({msg:error.message});
+}
+}
+module.exports = { create_user, validate_user, renewtoken,getUserInfo,editProfileImage,editProfileQuote };
