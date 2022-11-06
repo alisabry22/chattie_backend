@@ -1,18 +1,19 @@
 const mongoose = require("mongoose");
 const ObjectId = require("mongoose/lib/types/objectid");
+const { countDocuments } = require("../models/chatmodel");
 const chatmodel = require("../models/chatmodel");
 const usermodel = require("../models/usermodel");
 
 
- const createChat= async (req,res)=> {
+const createChat = async (req, res) => {
 
- 
-   
-    var isChat = await chatmodel.find(  {
+
+
+    var isChat = await chatmodel.find({
         isgroupChat: false,
         $and: [
             { users: { $elemMatch: { $eq: req.user._id } } },
-            { users: { $elemMatch: { $eq:req.body.userId} } },
+            { users: { $elemMatch: { $eq: req.body.userId } } },
         ],
     }).populate("users", "-password")
         .populate("latestMessage");
@@ -22,10 +23,11 @@ const usermodel = require("../models/usermodel");
         select: "username email phone",
     });
 
-    
+
     if (isChat.length > 0) {
 
-        return res.status(200).json({"chatId":isChat[0]._id});
+
+        return res.status(200).json({ "chatId": isChat[0]._id });
     } else {
         try {
 
@@ -36,20 +38,27 @@ const usermodel = require("../models/usermodel");
             };
 
             const createChatroom = await chatmodel.create(chatData);
-            const chat = await chatmodel.findById(createChatroom._id );
-            
-            return res.status(200).json({"chatId":chat._id});
+            const chat = await chatmodel.findById(createChatroom._id);
+            await usermodel.findByIdAndUpdate(req.user._id, { $push: { chats: chat._id } });
+            await usermodel.findByIdAndUpdate(req.body.userId, { $push: { chats: chat._id } });
+            return res.status(200).json({ "chatId": chat._id });
 
 
         } catch (error) {
-           return error.message;
+            return error.message;
         }
     }
 }
 const fetchAllChats = async (req, res) => {
 
     try {
-        
+
+        var userchat = await usermodel.findById(req.user._id)
+        .populate("chats").
+        populate("groupAdmin", "-password").
+        populate("latestMessage.sender", "username email phone countrycode");
+        console.log(userchat);
+
         var chat = await chatmodel.find({ users: { $elemMatch: { $eq: req.user._id } } })
             .populate("users", "-password -stories")
             .populate("groupAdmin", "-password ")
@@ -140,9 +149,9 @@ const addUserToGroup = async (req, res) => {
         });
     }
 
-    var testgroup = await chatmodel.find({ _id:req.body.chatId,users: { $in: req.body.users } }, "_id");
+    var testgroup = await chatmodel.find({ _id: req.body.chatId, users: { $in: req.body.users } }, "_id");
     console.log(testgroup);
-    if (testgroup.length>=1) {
+    if (testgroup.length >= 1) {
         return res.status(400).json({
             msg: "you can't add people already in this chat group"
         })
@@ -170,28 +179,28 @@ const addUserToGroup = async (req, res) => {
 
 }
 
-const removeUserFromGroup=async(req,res)=>{
+const removeUserFromGroup = async (req, res) => {
 
 
-const removeuser=await chatmodel.findByIdAndUpdate(req.body.chatId,{
-    $pull:{
-        users:ObjectId(req.body.userid)
+    const removeuser = await chatmodel.findByIdAndUpdate(req.body.chatId, {
+        $pull: {
+            users: ObjectId(req.body.userid)
+        }
+    },
+        {
+            new: true
+        });
+    console.log(removeuser);
+
+    if (!removeuser) {
+        return res.status(404).json({
+            msg: "can't delete user from group"
+        });
+
     }
-},
-{
-    new:true
-});
-console.log(removeuser);
-
-if(!removeuser){
-    return res.status(404).json({
-    msg:"can't delete user from group"
+    return res.status(200).json({
+        msg: "user deleted succssefully"
     });
 
 }
-return res.status(200).json({
-    msg:"user deleted succssefully"
-});
-
-}
-module.exports = { createChat, fetchAllChats, createGroupChat, editGroupChat, addUserToGroup,removeUserFromGroup };
+module.exports = { createChat, fetchAllChats, createGroupChat, editGroupChat, addUserToGroup, removeUserFromGroup };

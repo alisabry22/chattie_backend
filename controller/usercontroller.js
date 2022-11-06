@@ -62,7 +62,8 @@ validate_user = async (req, res) => {
         const validatepw = bcrypt.compare(password, user.password);
         if (!validatepw) return res.status(400).json({ msg: "password isn't right" })
 
-        const token = jwt.sign({ uid: user.id },process.env.JWT_KEY, { expiresIn: "30d" })
+        const token = jwt.sign({ uid: user.id },process.env.JWT_KEY, { expiresIn: "30d" });
+        console.log(user);
         return res.status(200).json({ user, token: token });
     } catch (e) {
         return res.status(500).json({ msg: e.message })

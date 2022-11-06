@@ -8,4 +8,5 @@ storyLink:{type:String},
     timestamps:true
 });
 
+storyModel.index({createdAt:1},{expireAfterSeconds:5});
 module.exports=mongoose.model("Story",storyModel);
