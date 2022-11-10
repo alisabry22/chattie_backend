@@ -53,31 +53,20 @@ const fetchAllChats = async (req, res) => {
 
     try {
 
-        var userchat = await usermodel.findById(req.user._id)
-        .populate("chats").
-        populate("groupAdmin", "-password").
-        populate("latestMessage.sender", "username email phone countrycode");
+        var userchat = await usermodel.findById(req.user._id).select("-password -countrycode -quote").populate("chats");
+
+      
         console.log(userchat);
 
-        var chat = await chatmodel.find({ users: { $elemMatch: { $eq: req.user._id } } })
-            .populate("users", "-password -stories")
-            .populate("groupAdmin", "-password ")
-            .populate("latestMessage")
-            .sort({ updatedAt: -1 });
-        ;
-        chat = await usermodel.populate(chat, {
-            path: "latestMessage.sender",
-            select: "username email phone countrycode "
-        });
+       
+     
+        console.log("chat  ",userchat);
         return res.status(200).json({
-            chat
+            userchat
         });
     } catch (error) {
         return res.status(500).json({ msg: error.message });
     }
-
-
-
 
 }
 
