@@ -2,7 +2,7 @@ const mongoose=require("mongoose");
 
 
 
-const MessageSchema=new mongoose.Schema({
+const messagemodel=new mongoose.Schema({
 
 
     sender:{type:mongoose.Schema.Types.ObjectId,ref:"User"},
@@ -15,4 +15,4 @@ const MessageSchema=new mongoose.Schema({
 },
 {timestamps:true}
 );
-module.exports=mongoose.model("Message",MessageSchema);
+module.exports=mongoose.model("Message",messagemodel);

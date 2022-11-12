@@ -2,6 +2,7 @@ const mongoose = require("mongoose");
 const ObjectId = require("mongoose/lib/types/objectid");
 const { countDocuments } = require("../models/chatmodel");
 const chatmodel = require("../models/chatmodel");
+const messagemodel = require("../models/messagemodel");
 const usermodel = require("../models/usermodel");
 
 
@@ -53,16 +54,26 @@ const fetchAllChats = async (req, res) => {
 
     try {
 
-        var userchat = await usermodel.findById(req.user._id).select("-password -countrycode -quote").populate("chats");
+        var userdata = await usermodel.findOne({_id:req.user._id}).select("-stories -password -quote")
+        .populate({
+            path:"chats",
+            model:"Chat",
+            populate:{
+                path:"users",
+                model:"User",
+                match:{_id:{$ne:req.user._id}},
+                select:"-stories -chats -password",
+            },
+        });
 
+        userdata=await chatmodel.populate(userdata,"chats.latestMessage");
       
-        console.log(userchat);
 
-       
-     
-        console.log("chat  ",userchat);
+
+
+        console.log("chat  ", userdata);    
         return res.status(200).json({
-            userchat
+            userdata
         });
     } catch (error) {
         return res.status(500).json({ msg: error.message });

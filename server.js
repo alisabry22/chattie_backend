@@ -47,6 +47,7 @@ io.on("connection", (client) => {
   client.on("sendMessage", async (data) => {
 
     message = await sendMessage(data.content, data.sender, data.chatId);
+    console.log(message);
     io.to(data.chatId).emit("message", message);
   })
 
@@ -59,7 +60,7 @@ console.log(data);
 
 switch(data.operationType){
   case 'update':
-    var message = await messagemodel.findById(data.updateDescription.updatedFields.latestMessage).populate("sender","username email phone countrycode");
+    var message = await messagemodel.findById(data.updateDescription.updatedFields.latestMessage);
     io.emit("latestmessage",message);
     break;
     case 'delete':

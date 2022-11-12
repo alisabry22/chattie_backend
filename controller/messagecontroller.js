@@ -10,7 +10,7 @@ var message={
 };
 
 var uploadmessage=await messagemodel.create(message);
-uploadmessage=await messagemodel.findById(uploadmessage._id).populate("sender","username email phone countrycode");
+uploadmessage=await messagemodel.findById(uploadmessage._id);
 await chatmodel.findByIdAndUpdate(chatId,{latestMessage:uploadmessage._id});
 return uploadmessage;
 
@@ -21,8 +21,8 @@ const allMessages=async(req,res)=>{
 	console.log("chat id ", chatId);
 
    try {
-	 const messages=await messagemodel.find({chat:chatId}).populate("sender","username phone email countrycode ");
-	
+	 const messages=await messagemodel.find({chat:chatId});
+		console.log(messages);
 	    res.status(200).json({messages});
 } catch (error) {
 	return res.status(500).json({msg:error.message});

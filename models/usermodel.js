@@ -11,6 +11,7 @@ const user= mongoose.Schema({
     profilephoto:{type:String},
     chats:[{type:mongoose.Schema.Types.ObjectId,ref:"Chat"}],
     quote:{type:String,default:"Hello There Iam Using chattie"},
+    online:{type:Boolean , default:false},
     stories:[
         {
             type:mongoose.Schema.Types.ObjectId,
